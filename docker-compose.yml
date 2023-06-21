@@ -1,0 +1,59 @@
+version: "3.5"
+services:
+  # CMS
+  php-apache:
+    restart: on-failure
+    build:
+      context: ./docker/php
+    ports:
+      - 8002:80
+    environment:
+      APACHE_DOCUMENT_ROOT: "/var/www/html/public"
+      REMOTE_USER: ""
+    volumes:
+      - .:/var/www/html:z
+
+  # DB
+  db:
+    image: mariadb:10.3
+    environment:
+      MYSQL_ROOT_PASSWORD: "db"
+    volumes:
+      - db:/var/lib/mysql
+      - ./backup:/var/backup
+    ports:
+      - 13306:3306
+
+  adminer:
+    image: wodby/adminer:4.7
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: mysql
+      ADMINER_DEFAULT_DB_HOST: db
+      ADMINER_DEFAULT_DB_NAME: typo3db
+      ADMINER_DESIGN: nette
+      ADMINER_PLUGINS: tables-filter tinymce
+    ports:
+      - 8070:9000
+
+  ###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+  db:
+
+  ###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###
