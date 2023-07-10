@@ -62,4 +62,14 @@ class Product
 
         return $this;
     }
+
+    public function getAllProduct(): array
+    {
+        $product = [
+            "title" => $this->title,
+            "price" => $this->price,
+            "description" => $this->description,
+        ];
+        return $product;
+    }
 }
