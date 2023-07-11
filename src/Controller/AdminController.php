@@ -38,9 +38,9 @@ class AdminController extends AbstractController
    public function addProductToDatabase(ProductRepository $productRepository, Request $request, EntityManagerInterface $entityManager)
    {
       $requestData = $request->get('submit');
-      $productName = strval($request->request->get('productName'));
-      $price = floatval($request->request->get('price'));
-      $description = strval($request->request->get('description'));
+      $productName = strval($request->get('productName'));
+      $price = floatval($request->get('price'));
+      $description = strval($request->get('description'));
       if (isset($requestData)) {
          $product = new Product();
          $product->setTitle($productName);
@@ -52,11 +52,10 @@ class AdminController extends AbstractController
       return $this->redirectToRoute('adminProducts');
    }
 
-   #[Route("/admin/products/delete", name: "deleteProduct")]
+   #[Route("/admin/products/deleteProduct", name: "deleteProduct", methods: ['POST'])]
    public function deleteProduct(Request $request, EntityManagerInterface $entityManager)
    {
-      $selectedProducts = $request->request->get('selectedProducts');
-
+      $selectedProducts = $request->get('selectedProducts');
       if (!empty($selectedProducts)) {
          foreach ($selectedProducts as $productId) {
             $product = $entityManager->getRepository(Product::class)->find($productId);
@@ -64,12 +63,8 @@ class AdminController extends AbstractController
                $entityManager->remove($product);
             }
          }
-
          $entityManager->flush();
       }
-
-      // Redirect to the admin products page or render a success message
-      // You can adjust this based on your application's requirements
       return $this->redirectToRoute('adminProducts');
    }
 }

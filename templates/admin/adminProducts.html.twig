@@ -21,10 +21,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="POST" action="/admin/products/delete" id="deleteProductForm">
+        <form method="POST" action="/admin/products/deleteProduct" id="deleteProductForm">
           {% for product in products %}
             <div class="form-check">
               <input class="form-check-input" type="checkbox" value="{{ product.id }}" name="selectedProducts[]" id="product_{{ product.id }}">
@@ -33,15 +32,16 @@
               </label>
             </div>
           {% endfor %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button form="deleteProductForm" name="submit" type="submit" class="btn btn-danger">Delete</button>
+          </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button form="deleteProductForm" name="submit" type="submit" class="btn btn-danger">Delete</button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!--Add-->
 <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
@@ -74,23 +74,55 @@
   </div>
 </div>
 
-
+{% set manageProduct = "" %}
 <!--Manage-->
 <div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="manageModalLabel">Manage Product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-
+      {% for product in products %}
+        <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageSpecificModel">{{ product.title }}</button>
+      {% endfor %}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save Changes</button>
       </div>
     </div>
   </div>
 </div>
+
+<!--manage specific product-->
+<div class="modal fade" id="manageSpecificModel" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Manage {{ manageProduct.title }}</h5>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/admin/products/addProduct" id="manageProductForm">
+          <div class="mb-3">
+            <label for="productName" class="form-label">Name</label>
+            <input type="text" class="form-control" name="productName" value="{{ manageProduct.title }}">
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" name="price" placeholder="Enter Product Price">
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#manageModal">Back</button>
+        <button form="manageProductForm" name="submit" type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+        </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
