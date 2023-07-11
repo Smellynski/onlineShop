@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -21,6 +22,12 @@ class Product
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $categorys = [];
+
+    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    private $productImage = null;
 
     public function getId(): ?int
     {
@@ -71,5 +78,29 @@ class Product
             "description" => $this->description,
         ];
         return $product;
+    }
+
+    public function getCategorys(): array
+    {
+        return $this->categorys;
+    }
+
+    public function setCategorys(array $category): static
+    {
+        $this->categorys = $category;
+
+        return $this;
+    }
+
+    public function getProductImage()
+    {
+        return $this->productImage;
+    }
+
+    public function setProductImage($productImage): static
+    {
+        $this->productImage = $productImage;
+
+        return $this;
     }
 }

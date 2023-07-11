@@ -64,6 +64,10 @@
             <label for="description" class="form-label">Description</label>
             <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
           </div>
+          <div class="mb-3">
+            <label for="categorys" class="form-label">Categorys</label>
+            <input type="text" class="form-control" name="categorys" placeholder="Enter Product categorys">
+          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -74,8 +78,9 @@
   </div>
 </div>
 
-{% set manageProduct = "" %}
-<!--Manage-->
+{% set manageProduct = ''%}
+
+<!-- Manage -->
 <div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -83,9 +88,10 @@
         <h5 class="modal-title" id="manageModalLabel">Manage Product</h5>
       </div>
       <div class="modal-body">
-      {% for product in products %}
-        <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageSpecificModel">{{ product.title }}</button>
-      {% endfor %}
+          <h5 class="modal-title" >comming soon...</h5>
+          {# {% for product in products %}
+          <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageSpecificModel" onclick="setManageProduct('{{ product|json_encode()|e('js') }}')">{{ product.title }}</button>
+        {% endfor %}#}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -94,18 +100,18 @@
   </div>
 </div>
 
-<!--manage specific product-->
+<!-- Manage specific product -->
 <div class="modal fade" id="manageSpecificModel" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addModalLabel">Manage {{ manageProduct.title }}</h5>
+        <h5 class="modal-title" id="addModalLabel"></h5>
       </div>
       <div class="modal-body">
         <form method="POST" action="/admin/products/addProduct" id="manageProductForm">
           <div class="mb-3">
             <label for="productName" class="form-label">Name</label>
-            <input type="text" class="form-control" name="productName" value="{{ manageProduct.title }}">
+            <input type="text" class="form-control" name="productName" value="">
           </div>
           <div class="mb-3">
             <label for="price" class="form-label">Price</label>
@@ -115,14 +121,14 @@
             <label for="description" class="form-label">Description</label>
             <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
           </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#manageModal">Back</button>
         <button form="manageProductForm" name="submit" type="submit" class="btn btn-primary">Save Changes</button>
       </div>
-        </form>
     </div>
   </div>
 </div>
-
 {% endblock %}
+
