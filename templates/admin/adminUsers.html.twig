@@ -81,10 +81,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="manageModalLabel">Manage User</h5>
+        <h5 class="modal-title" id="manageModalLabel">Manage Users</h5>
       </div>
       <div class="modal-body">
-         <h5 class="modal-title">comming soon...</h5>
+        {% for user in users %}
+          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{user.username}}')">{{ user.username }}</button>
+        {% endfor %}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -92,6 +94,84 @@
     </div>
   </div>
 </div>
+
+<!--manage specific user-->
+<div class="modal fade" id="manageSpecificModel" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="manageModalLabel">Manage User</h5>
+      </div>
+      <div class="modal-body">
+      <form method="POST" action="/admin/products/manageProduct" id="manageUserForm">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" value="">
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" placeholder="Enter email">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Enter password">
+          </div>
+          <div class="invisible" style="display: none;">
+            <label for="usernameOrignal" class="form-label">Username</label>
+            <input type="text" class="form-control" name="usernameOrignal" value="">
+          </div>
+          <div class="invisible" style="display: none;">
+            <label for="emailOrignal" class="form-label">Email</label>
+            <input type="email" class="form-control" name="emailOrignal" placeholder="Enter email">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button form="manageUserForm" name="submit" type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const getDataForManage = (username) => {
+  const url = '/admin/users/getUserData';
+  const xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("POST", url, true);
+  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xmlhttp.send('username=' + username);
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      let data = JSON.parse(this.responseText);
+      console.log(data);
+      showManageModal(data);
+    }
+  };
+}
+
+const showManageModal = (data) => {
+  const username = document.querySelector('#manageProductForm [name="username"]');
+  const email = document.querySelector('#manageProductForm [name="email"]');
+
+  //invisible part 
+  const usernameOrignal = document.querySelector('#manageProductForm [name="usernameOrignal"]');
+  const emailOrignal = document.querySelector('#manageProductForm [name="emailOrignal"]');
+
+  username.value = data.username;
+  email.value = data.email;
+
+  //invisible part 
+  usernameOrignal.value = data.username;
+  emailOrignal.value = data.email;
+
+  const manageModal = new bootstrap.Modal(document.getElementById('manageSpecificModel'));
+  manageModal.show();
+}
+</script>
+
+
 
 {% endblock %}
 

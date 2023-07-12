@@ -10,6 +10,7 @@
       <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#addModal">Add Product</button>
     </div>
     <div class="col-md-4">
+      <!--<a href="/admin/products/manageProductOld"><button type="button" class="btn btn-primary btn-block">Manage Product</button></div></a>-->
       <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageModal">Manage Product</button>
     </div>
   </div>
@@ -78,8 +79,6 @@
   </div>
 </div>
 
-{% set manageProduct = ''%}
-
 <!-- Manage -->
 <div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -88,10 +87,11 @@
         <h5 class="modal-title" id="manageModalLabel">Manage Product</h5>
       </div>
       <div class="modal-body">
-          <h5 class="modal-title" >comming soon...</h5>
-          {# {% for product in products %}
-          <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageSpecificModel" onclick="setManageProduct('{{ product|json_encode()|e('js') }}')">{{ product.title }}</button>
-        {% endfor %}#}
+        {#<h5 class="modal-title" >comming soon...</h5>#}
+        {% for product in products %}
+          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{product.title}}')">{{ product.title }}</button>
+        {% endfor %}
+        <!-- data-bs-toggle="modal" data-bs-target="#manageSpecificModel"-->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -104,11 +104,8 @@
 <div class="modal fade" id="manageSpecificModel" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addModalLabel"></h5>
-      </div>
       <div class="modal-body">
-        <form method="POST" action="/admin/products/addProduct" id="manageProductForm">
+        <form method="POST" action="/admin/products/manageProduct" id="manageProductForm">
           <div class="mb-3">
             <label for="productName" class="form-label">Name</label>
             <input type="text" class="form-control" name="productName" value="">
@@ -121,14 +118,73 @@
             <label for="description" class="form-label">Description</label>
             <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
           </div>
+          <div class="invisible" style="display: none;">
+            <label for="productNameOriginal" class="form-label">Name</label>
+            <input type="text" class="form-control" name="productNameOriginal" value="">
+          </div>
+          <div class="invisible" style="display: none;">
+            <label for="priceOriginal" class="form-label">Price</label>
+            <input type="number" class="form-control" name="priceOriginal" placeholder="Enter Product Price">
+          </div>
+          <div class="invisible" style="display: none;">
+            <label for="descriptionOriginal" class="form-label">Description</label>
+            <input type="text" class="form-control" name="descriptionOriginal" placeholder="Enter Product Description">
+          </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#manageModal">Back</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
         <button form="manageProductForm" name="submit" type="submit" class="btn btn-primary">Save Changes</button>
       </div>
     </div>
   </div>
 </div>
+
+
+<script>
+const getDataForManage = (productID) => {
+  const url = '/admin/products/getProductData';
+  const xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("POST", url, true);
+  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xmlhttp.send('productID=' + productID);
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      let data = JSON.parse(this.responseText);
+      showManageModal(data);
+    }
+  };
+}
+
+const showManageModal = (data) => {
+  const productNameInput = document.querySelector('#manageProductForm [name="productName"]');
+  const priceInput = document.querySelector('#manageProductForm [name="price"]');
+  const descriptionInput = document.querySelector('#manageProductForm [name="description"]');
+
+  //invisible part 
+  const productNameOriginal = document.querySelector('#manageProductForm [name="productNameOriginal"]');
+  const priceOriginal = document.querySelector('#manageProductForm [name="priceOriginal"]');
+  const descriptionOriginal = document.querySelector('#manageProductForm [name="descriptionOriginal"]');
+
+  productNameInput.value = data.title;
+  priceInput.value = data.price;
+  descriptionInput.value = data.description;
+
+  //invisible part 
+  productNameOriginal.value = data.title;
+  priceOriginal.value = data.price;
+  descriptionOriginal.value = data.description;
+
+  const manageModal = new bootstrap.Modal(document.getElementById('manageSpecificModel'));
+  manageModal.show();
+}
+</script>
+
+
+
 {% endblock %}
+
+
+
+
 

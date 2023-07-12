@@ -1,0 +1,35 @@
+{% extends 'basepages/baseAdminPage.html.twig' %}
+
+{% block body %}
+<div class="container">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <form method="POST" action="/admin/products/manageProduct" id="manageProductForm">
+         <div class="mb-3">
+            <label for="whichProduct" class="form-label">Product to edit</label>
+            <select class="form-select" name="productName">
+            <option value="" selected disabled>Select a Product</option>
+            {% for product in products %}
+            <option value="{{ product.title }}">{{ product.title }}</option>
+            {% endfor %}
+            </select>
+         </div>
+          <div class="mb-3">
+            <label for="productName" class="form-label">Name</label>
+            <input type="text" class="form-control" name="productName" placeholder="Enter Product Name">
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" name="price" placeholder="Enter Product Price">
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
+          </div>
+        <button type="button" class="btn btn-secondary">Cancel</button>
+        <button form="manageProductForm" name="submit" type="submit" class="btn btn-primary">Edit</button>
+        </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
