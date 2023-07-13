@@ -268,18 +268,16 @@ class AdminController extends AbstractController
    #[Route('admin/categories/getCategoryData', name: 'getCategoryData', methods: ['POST'])]
    public function getCategoryData(Request $request, EntityManagerInterface $entityManager)
    {
-      dd($request);
-      $categoryId = $request->get('categoryId');
-      $category = $entityManager->getRepository(Category::class)->findOneBy(['id' => $categoryId]);
-
-      if ($category != null) {
-         $categoryData = [
-            'id' => $category->getId(),
-            'name' => $category->getName(),
+      $userId = $request->get('categoryId');
+      $user = $entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
+      if ($user != null) {
+         $productData = [
+            'id' => $user->getId(),
+            'name' => $user->getUsername(),
          ];
-         return $this->json($categoryData);
+         return $this->json($productData);
       }
 
-      return $this->json(['error' => 'Category not found']);
+      return $this->json(['error' => 'Product not found']);
    }
 }

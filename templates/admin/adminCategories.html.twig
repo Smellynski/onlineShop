@@ -114,19 +114,18 @@
 
 
 <script>
+
 function getDataForManage(categoryId) {
-   const url = 'admin/categories/getCategoryData';
-   const xmlhttp = new XMLHttpRequest();
-   xmlhttp.open("POST", url, true);
-   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-   xmlhttp.send('categoryId=' + categoryId);
-   xmlhttp.onreadystatechange = function() {
-    console.log(this.responseText);
-   if (this.readyState == 4 && this.status == 200) {
+   const url = '/admin/categories/getCategoryData';
+  const xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("POST", url, true);
+  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xmlhttp.send('categoryId=' + categoryId);
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
       let data = JSON.parse(this.responseText);
-      console.log(data);
-      //showManageModal(data);
-   }
+      showManageModal(data);
+    }
   };
 }
 
