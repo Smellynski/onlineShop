@@ -85,7 +85,7 @@
       </div>
       <div class="modal-body">
         {% for user in users %}
-          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{user.username}}')">{{ user.username }}</button>
+          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{user.id}}')">{{ user.username }}</button>
         {% endfor %}
       </div>
       <div class="modal-footer">
@@ -103,7 +103,7 @@
         <h5 class="modal-title" id="manageModalLabel">Manage User</h5>
       </div>
       <div class="modal-body">
-      <form method="POST" action="/admin/products/manageProduct" id="manageUserForm">
+      <form method="POST" action="/admin/users/manage" id="manageUserForm">
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" name="username" value="">
@@ -117,12 +117,8 @@
             <input type="password" class="form-control" name="password" placeholder="Enter password">
           </div>
           <div class="invisible" style="display: none;">
-            <label for="usernameOrignal" class="form-label">Username</label>
-            <input type="text" class="form-control" name="usernameOrignal" value="">
-          </div>
-          <div class="invisible" style="display: none;">
-            <label for="emailOrignal" class="form-label">Email</label>
-            <input type="email" class="form-control" name="emailOrignal" placeholder="Enter email">
+            <label for="userId" class="form-label">ID</label>
+            <input type="text" class="form-control" name="userId" value="">
           </div>
         </form>
       </div>
@@ -136,35 +132,30 @@
 
 
 <script>
-const getDataForManage = (username) => {
+const getDataForManage = (userID) => {
   const url = '/admin/users/getUserData';
   const xmlhttp = new XMLHttpRequest();
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send('username=' + username);
+  xmlhttp.send('userId=' + userID);
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       let data = JSON.parse(this.responseText);
-      console.log(data);
       showManageModal(data);
     }
   };
 }
 
 const showManageModal = (data) => {
-  const username = document.querySelector('#manageProductForm [name="username"]');
-  const email = document.querySelector('#manageProductForm [name="email"]');
+  const username = document.querySelector('#manageUserForm [name="username"]');
 
   //invisible part 
-  const usernameOrignal = document.querySelector('#manageProductForm [name="usernameOrignal"]');
-  const emailOrignal = document.querySelector('#manageProductForm [name="emailOrignal"]');
+  const userId = document.querySelector('#manageUserForm [name="userId"]');
 
   username.value = data.username;
-  email.value = data.email;
 
   //invisible part 
-  usernameOrignal.value = data.username;
-  emailOrignal.value = data.email;
+  userId.value = data.id;
 
   const manageModal = new bootstrap.Modal(document.getElementById('manageSpecificModel'));
   manageModal.show();

@@ -13,6 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use App\Entity\Category;
+use App\Repository\CategoryRepository;
 
 class AdminController extends AbstractController
 {
@@ -82,28 +84,16 @@ class AdminController extends AbstractController
       $productName = strval($request->get('productName'));
       $price = floatval($request->get('price'));
       $description = strval($request->get('description'));
-      $productNameOriginal = strval($request->get('productNameOriginal'));
-      $priceOriginal = floatval($request->get('priceOriginal'));
-      $descriptionOriginal = strval($request->get('descriptionOriginal'));
+      $productID = strval($request->get('productID'));
 
-      $products = $entityManager->getRepository(Product::class)->findAll();
-      foreach ($products as $product) {
-         if (
-            $product->getTitle() == $productNameOriginal &&
-            $priceOriginal == $product->getPrice() &&
-            $descriptionOriginal == $product->getDescription()
-         ) {
-            if (isset($requestData)) {
-               $product->setTitle($productName);
-               $product->setPrice($price);
-               $product->setDescription($description);
-               $entityManager->persist($product);
-               $entityManager->flush();
-            }
-         }
+      $product = $entityManager->getRepository(Product::class)->findOneBy(['id' => $productID]);
+      if (isset($requestData)) {
+         $product->setTitle($productName);
+         $product->setPrice($price);
+         $product->setDescription($description);
+         $entityManager->persist($product);
+         $entityManager->flush();
       }
-
-
       return $this->redirectToRoute('adminProducts');
    }
 
@@ -111,20 +101,17 @@ class AdminController extends AbstractController
    public function getProductData(Request $request, EntityManagerInterface $entityManager)
    {
       $productId = $request->get('productID');
-      $products = $entityManager->getRepository(Product::class)->findAll();
-      foreach ($products as $prodcut) {
-         if ($prodcut->getTitle() == $productId) {
-            $product = $prodcut;
-         }
-      }
-      if ($product) {
+      $product = $entityManager->getRepository(Product::class)->findOneBy(['id' => $productId]);
+      if ($product != null) {
          $productData = [
+            'id' => $product->getId(),
             'title' => $product->getTitle(),
             'price' => $product->getPrice(),
             'description' => $product->getDescription(),
          ];
          return $this->json($productData);
       }
+
       return $this->json(['error' => 'Product not found']);
    }
 
@@ -180,29 +167,22 @@ class AdminController extends AbstractController
    }
 
    #[Route('/admin/users/manage', name: 'adminManageUser')]
-   public function adminManageUser(Request $request, EntityManagerInterface $entityManager)
+   public function adminManageUser(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
    {
       $requestData = $request->get('submit');
-      $username = $request->get('username');
-      $email = $request->get('email');
-      $pwd = $request->get('password');
-      $originalUsername = $request->get('usernameOrignal');
-      $originalEmail = $request->get('emailOrignal');
+      $username = strval($request->get('username'));
+      $email = strval($request->get('email'));
+      $pwd = strval($request->get('password'));
+      $userId = $request->get('userId');
 
-      $users = $entityManager->getRepository(User::class)->findAll();
-      foreach ($users as $user) {
-         if (
-            $user->getUsername() == $originalUsername &&
-            $user->getEmail() == $originalEmail
-         ) {
-            if (isset($requestData)) {
-               $user->setUsername($username);
-               $user->setEmail($email);
-               $user->setPassword($pwd);
-               $entityManager->persist($user);
-               $entityManager->flush();
-            }
-         }
+      $user = $entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
+      if (isset($requestData)) {
+         $hashedpwd = $passwordHasher->hashPassword($user, $pwd);
+         $user->setUsername($username);
+         $user->setEmail($email);
+         $user->setPassword($hashedpwd);
+         $entityManager->persist($user);
+         $entityManager->flush();
       }
 
       return $this->redirectToRoute('adminUsers');
@@ -211,17 +191,95 @@ class AdminController extends AbstractController
    #[Route('/admin/users/getUserData', name: 'getUserData', methods: ['POST'])]
    public function getUserData(Request $request, EntityManagerInterface $entityManager)
    {
-      $username = $request->get('username');
-      $users = $entityManager->getRepository(User::class)->findAll();
-      foreach ($users as $user) {
-         if ($user->getUsername() == $username) {
-            $userData = [
-               'username' => $user->getUsername(),
-               'email' => $user->getEmail(),
-            ];
-            return $this->json($userData);
-         }
+      $userId = $request->get('userId');
+      $user = $entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
+      if ($user != null) {
+         $productData = [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+         ];
+         return $this->json($productData);
       }
-      return $this->json(['error' => 'User not found']);
+
+      return $this->json(['error' => 'Product not found']);
+   }
+
+
+   //--------------------------Categories-------------------------------
+
+
+   #[Route('admin/categories', name: 'adminCategories')]
+   public function adminCategories(CategoryRepository $categoryRepository)
+   {
+      $categories = $categoryRepository->findAll();
+      return ($this->render(
+         'admin/adminCategories.html.twig',
+         ['categories' => $categories]
+      ));
+   }
+
+   #[Route('admin/categories/add', name: 'adminAddCategory')]
+   public function adminAddCategory(Request $request, EntityManagerInterface $entityManager)
+   {
+      $requestData = $request->get('submit');
+      $categoryName = strval($request->get('categoryName'));
+      if (isset($requestData)) {
+         $category = new Category();
+         $category->setName($categoryName);
+         $entityManager->persist($category);
+         $entityManager->flush();
+      }
+      return $this->redirectToRoute('adminCategories');
+   }
+
+   #[Route('admin/categories/delete', name: 'adminDeleteCategory')]
+   public function adminDeleteCategory(Request $request, EntityManagerInterface $entityManager)
+   {
+      $selectedCategories = $request->get('selectedCategories');
+      if (!empty($selectedCategories)) {
+         foreach ($selectedCategories as $category) {
+            $category = $entityManager->getRepository(Category::class)->find($category);
+            if ($category) {
+               $entityManager->remove($category);
+            }
+         }
+         $entityManager->flush();
+      }
+      return $this->redirectToRoute('adminCategories');
+   }
+
+   #[Route('admin/categories/manage', name: 'adminManageCategory')]
+   public function adminManageCategory(Request $request, EntityManagerInterface $entityManager)
+   {
+      $requestData = $request->get('submit');
+      $categoryName = strval($request->get('categoryName'));
+      $categoryId = $request->get('categoryId');
+
+      $category = $entityManager->getRepository(Category::class)->findOneBy(['id' => $categoryId]);
+      if (isset($requestData)) {
+         $category->setName($categoryName);
+         $entityManager->persist($category);
+         $entityManager->flush();
+      }
+
+      return $this->redirectToRoute('adminCategories');
+   }
+
+   #[Route('admin/categories/getCategoryData', name: 'getCategoryData', methods: ['POST'])]
+   public function getCategoryData(Request $request, EntityManagerInterface $entityManager)
+   {
+      dd($request);
+      $categoryId = $request->get('categoryId');
+      $category = $entityManager->getRepository(Category::class)->findOneBy(['id' => $categoryId]);
+
+      if ($category != null) {
+         $categoryData = [
+            'id' => $category->getId(),
+            'name' => $category->getName(),
+         ];
+         return $this->json($categoryData);
+      }
+
+      return $this->json(['error' => 'Category not found']);
    }
 }

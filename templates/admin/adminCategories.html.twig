@@ -1,0 +1,149 @@
+{% extends 'basepages/baseAdminPage.html.twig' %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete categories</button>
+    </div>
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#addModal">Add category</button>
+    </div>
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#manageModal">Manage catagories</button>
+    </div>
+  </div>
+</div>
+
+<!--Delete-->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/admin/categories/delete" id="deleteCategoriesForm">
+          {% for category in categories %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="{{ category.id }}" name="selectedUsers[]" id="product_{{ category.id }}">
+              <label class="form-check-label" for="product_{{ category.id }}">
+                {{ category.name }}
+              </label>
+            </div>
+          {% endfor %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button form="deleteCategoriesForm" name="submit" type="submit" class="btn btn-danger">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--Add-->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Add Category</h5>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/admin/categories/add" id="addCategoryForm">
+          <div class="mb-3">
+            <label for="categoryName" class="form-label">Name</label>
+            <input type="text" class="form-control" name="categoryName" placeholder="Enter name">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button form="addCategoryForm" name="submit" type="submit" class="btn btn-primary">Add</button>
+      </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Manage -->
+<div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="manageModalLabel">Manage Users</h5>
+      </div>
+      <div class="modal-body">
+        {% for category in categories %}
+          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{category.id}}')">{{ category.name }}</button>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--manage specific user-->
+<div class="modal fade" id="manageSpecificModel" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="manageModalLabel">Manage category</h5>
+      </div>
+      <div class="modal-body">
+      <form method="POST" action="admin/categories/manage" id="manageCategoryForm">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" value="">
+          <div class="invisible" style="display: none;">
+            <label for="categoryId" class="form-label">ID</label>
+            <input type="text" class="form-control" name="categoryId" value="">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button form="manageCategoryForm" name="submit" type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function getDataForManage(categoryId) {
+   const url = 'admin/categories/getCategoryData';
+   const xmlhttp = new XMLHttpRequest();
+   xmlhttp.open("POST", url, true);
+   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+   xmlhttp.send('categoryId=' + categoryId);
+   xmlhttp.onreadystatechange = function() {
+    console.log(this.responseText);
+   if (this.readyState == 4 && this.status == 200) {
+      let data = JSON.parse(this.responseText);
+      console.log(data);
+      //showManageModal(data);
+   }
+  };
+}
+
+const showManageModal = (data) => {
+  const name = document.querySelector('#manageCategoryForm [name="name"]');
+
+  //invisible part 
+  const categoryId = document.querySelector('#manageCategoryForm [name="categoryId"]');
+
+  name.value = data.name;
+
+  //invisible part 
+  categoryId.value = data.id;
+
+  const manageModal = new bootstrap.Modal(document.getElementById('manageSpecificModel'));
+  manageModal.show();
+}
+
+</script>
+{% endblock %}

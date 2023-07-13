@@ -89,7 +89,7 @@
       <div class="modal-body">
         {#<h5 class="modal-title" >comming soon...</h5>#}
         {% for product in products %}
-          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{product.title}}')">{{ product.title }}</button>
+          <button type="button" class="btn btn-primary btn-block"  onclick="getDataForManage('{{product.id}}')">{{ product.title }}</button>
         {% endfor %}
         <!-- data-bs-toggle="modal" data-bs-target="#manageSpecificModel"-->
       </div>
@@ -119,17 +119,8 @@
             <input type="text" class="form-control" name="description" placeholder="Enter Product Description">
           </div>
           <div class="invisible" style="display: none;">
-            <label for="productNameOriginal" class="form-label">Name</label>
-            <input type="text" class="form-control" name="productNameOriginal" value="">
-          </div>
-          <div class="invisible" style="display: none;">
-            <label for="priceOriginal" class="form-label">Price</label>
-            <input type="number" class="form-control" name="priceOriginal" placeholder="Enter Product Price">
-          </div>
-          <div class="invisible" style="display: none;">
-            <label for="descriptionOriginal" class="form-label">Description</label>
-            <input type="text" class="form-control" name="descriptionOriginal" placeholder="Enter Product Description">
-          </div>
+            <label for="productID" class="form-label">Name</label>
+            <input type="text" class="form-control" name="productID" value="">
         </form>
       </div>
       <div class="modal-footer">
@@ -162,26 +153,19 @@ const showManageModal = (data) => {
   const descriptionInput = document.querySelector('#manageProductForm [name="description"]');
 
   //invisible part 
-  const productNameOriginal = document.querySelector('#manageProductForm [name="productNameOriginal"]');
-  const priceOriginal = document.querySelector('#manageProductForm [name="priceOriginal"]');
-  const descriptionOriginal = document.querySelector('#manageProductForm [name="descriptionOriginal"]');
+  const productID = document.querySelector('#manageProductForm [name="productID"]');
 
   productNameInput.value = data.title;
   priceInput.value = data.price;
   descriptionInput.value = data.description;
 
   //invisible part 
-  productNameOriginal.value = data.title;
-  priceOriginal.value = data.price;
-  descriptionOriginal.value = data.description;
+  productID.value = data.id;
 
   const manageModal = new bootstrap.Modal(document.getElementById('manageSpecificModel'));
   manageModal.show();
 }
 </script>
-
-
-
 {% endblock %}
 
 
