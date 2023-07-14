@@ -16,6 +16,7 @@ class Media
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
+    // ! Besteht aus der ProductID und dem Produktname
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 

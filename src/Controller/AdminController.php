@@ -50,6 +50,11 @@ class AdminController extends AbstractController
       $productName = strval($request->get('productName'));
       $price = floatval($request->get('price'));
       $description = strval($request->get('description'));
+      $image = $request->files->get('productImage');
+      dd(gettype($image));
+      $imagePath = '/var/www/html/public/Media/temp/';
+      move_uploaded_file($_FILES[$image][$productName], $imagePath);
+      die();
       if (isset($requestData)) {
          $product = new Product();
          $product->setTitle($productName);
@@ -114,8 +119,6 @@ class AdminController extends AbstractController
 
       return $this->json(['error' => 'Product not found']);
    }
-
-
 
    //--------------------------USERS-------------------------------
 
@@ -194,14 +197,14 @@ class AdminController extends AbstractController
       $userId = $request->get('userId');
       $user = $entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
       if ($user != null) {
-         $productData = [
+         $userData = [
             'id' => $user->getId(),
             'username' => $user->getUsername(),
          ];
-         return $this->json($productData);
+         return $this->json($userData);
       }
 
-      return $this->json(['error' => 'Product not found']);
+      return $this->json(['error' => 'User not found']);
    }
 
 
@@ -213,7 +216,7 @@ class AdminController extends AbstractController
    {
       $categories = $categoryRepository->findAll();
       return ($this->render(
-         'admin/adminCategories.html.twig',
+         '/admin/adminCategories.html.twig',
          ['categories' => $categories]
       ));
    }
@@ -252,7 +255,7 @@ class AdminController extends AbstractController
    public function adminManageCategory(Request $request, EntityManagerInterface $entityManager)
    {
       $requestData = $request->get('submit');
-      $categoryName = strval($request->get('categoryName'));
+      $categoryName = strval($request->get('name'));
       $categoryId = $request->get('categoryId');
 
       $category = $entityManager->getRepository(Category::class)->findOneBy(['id' => $categoryId]);
@@ -268,16 +271,16 @@ class AdminController extends AbstractController
    #[Route('admin/categories/getCategoryData', name: 'getCategoryData', methods: ['POST'])]
    public function getCategoryData(Request $request, EntityManagerInterface $entityManager)
    {
-      $userId = $request->get('categoryId');
-      $user = $entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
-      if ($user != null) {
-         $productData = [
-            'id' => $user->getId(),
-            'name' => $user->getUsername(),
+      $categoryId = $request->get('categoryId');
+      $category = $entityManager->getRepository(Category::class)->findOneBy(['id' => $categoryId]);
+      if ($category != null) {
+         $categoryData = [
+            'id' => $category->getId(),
+            'name' => $category->getName(),
          ];
-         return $this->json($productData);
+         return $this->json($categoryData);
       }
 
-      return $this->json(['error' => 'Product not found']);
+      return $this->json(['error' => 'Category not found']);
    }
 }

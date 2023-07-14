@@ -27,8 +27,8 @@
         <form method="POST" action="/admin/users/delete" id="deleteUsersForm">
           {% for user in users %}
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="{{ user.id }}" name="selectedUsers[]" id="product_{{ user.id }}">
-              <label class="form-check-label" for="product_{{ user.id }}">
+              <input class="form-check-input" type="checkbox" value="{{ user.id }}" name="selectedUsers[]" id="user_{{ user.id }}">
+              <label class="form-check-label" for="user_{{ user.id }}">
                 {{ user.username }}
               </label>
             </div>

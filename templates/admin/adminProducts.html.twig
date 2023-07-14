@@ -52,7 +52,7 @@
         <h5 class="modal-title" id="addModalLabel">Add Product</h5>
       </div>
       <div class="modal-body">
-        <form method="POST" action="/admin/products/addProduct" id="addProductForm">
+        <form method="POST" action="/admin/products/addProduct" id="addProductForm" enctype="multipart/form-data">
           <div class="mb-3">
             <label for="productName" class="form-label">Name</label>
             <input type="text" class="form-control" name="productName" placeholder="Enter Product Name">
@@ -68,6 +68,10 @@
           <div class="mb-3">
             <label for="categorys" class="form-label">Categorys</label>
             <input type="text" class="form-control" name="categorys" placeholder="Enter Product categorys">
+          </div>
+          <div class="mb-3">
+            <label for="productImage" class="form-label">Productimage</label>
+            <input type="file" class="form-control" name="productImage">
           </div>
       </div>
       <div class="modal-footer">
