@@ -15,6 +15,7 @@ use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
+use App\Controller\MediaController;
 
 class AdminController extends AbstractController
 {
@@ -36,7 +37,7 @@ class AdminController extends AbstractController
       ]);
    }
    #[Route('/admin/products/manageProductOld', name: 'managePorudctsOld')]
-   public function manageProductsOld(Request $request, EntityManagerInterface $entityManager)
+   public function manageProductsOld(EntityManagerInterface $entityManager)
    {
       return $this->render('admin/manageProducts.html.twig', [
          'products' => $entityManager->getRepository(Product::class)->findAll(),
@@ -44,22 +45,26 @@ class AdminController extends AbstractController
    }
 
    #[Route('/admin/products/addProduct', name: 'addProductToDatabase', methods: ['POST'])]
-   public function addProductToDatabase(Request $request, EntityManagerInterface $entityManager)
+   public function addProductToDatabase(Request $request, EntityManagerInterface $entityManager, MediaController $mediaController)
    {
       $requestData = $request->get('submit');
       $productName = strval($request->get('productName'));
       $price = floatval($request->get('price'));
       $description = strval($request->get('description'));
       $image = $request->files->get('productImage');
-      dd(gettype($image));
-      $imagePath = '/var/www/html/public/Media/temp/';
-      move_uploaded_file($_FILES[$image][$productName], $imagePath);
-      die();
+      if ($image) {
+         $image->move(
+            $this->getParameter('temporary_directory'),
+            $image->getClientOriginalName()
+         );
+         $imagePath = $mediaController->optimizeImage($entityManager, $image->getClientOriginalName(), $productName);
+      }
       if (isset($requestData)) {
          $product = new Product();
          $product->setTitle($productName);
          $product->setPrice($price);
          $product->setDescription($description);
+         $product->setImagePath($imagePath);
          $entityManager->persist($product);
          $entityManager->flush();
       }

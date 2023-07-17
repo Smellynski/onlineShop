@@ -1,40 +1,30 @@
 {% extends 'basepages/baseShopPage.html.twig' %}
 
-{% block header %}
-<header class="p-3 mb-3 border-bottom">
-    <div class="container">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
-          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-        </a>
+{% block body %}
 
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="#" class="nav-link px-2 link-body-emphasis">Startseite</a></li>
-          <li><a href="#" class="nav-link px-2 link-body-emphasis">Kategorien</a></li>
-          <li><a href="#" class="nav-link px-2 link-body-emphasis">Über uns</a></li>
-        </ul>
+<div class="container mt-4">
 
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-          <input type="search" class="form-control" placeholder="Suchen..." aria-label="Search">
-        </form>
-
-        <div class="dropdown text-end">
-          <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="mdo" width="32" height="32" class="rounded-circle">
-          </a>
-          <ul class="dropdown-menu text-small" style="">
-            {% if false  %} <!--need to be changed-->
-            <li><a class="dropdown-item" href="#">Warenkorb</a></li>
-            <li><a class="dropdown-item" href="#">Einstellungen</a></li>
-            <li><a class="dropdown-item" href="#">Profil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Abmelden</a></li>
-            {% else %}
-            <li><a class="dropdown-item" href="/login">Anmelden</a></li>
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <a href="#" class="text-decoration-none text-dark"> <!-- Add your product link here -->
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="{{product.imagePath}}" class="card-img-top" alt="{{ product.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.title }}</h5>
+                            <p class="card-text">Price: {{ product.price }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- relative path-->
+            <!--http://localhost:8002/#public/Media/optimized/meinProdukt.png-->
+            {% if loop.index % 3 == 0 %}
+                </div><div class="row">
             {% endif %}
-          </ul>
-        </div>
-      </div>
+        {% endfor %}
     </div>
-  </header>
+
+</div>
+
 {% endblock %}

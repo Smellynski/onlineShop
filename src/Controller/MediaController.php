@@ -11,26 +11,23 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class MediaController extends AbstractController
 {
-   #[Route('/media', name: 'media')]
-   public function index(EntityManagerInterface $entityManager = null)
-   {
-      $this->optimizeImage($entityManager);
-      return (new Response('Hello World!'));
-   }
-   public function optimizeImage(EntityManagerInterface $entityManager)
+   public function optimizeImage(EntityManagerInterface $entityManager, $originalName, $productName)
    {
       if (!$entityManager) {
          return;
       }
 
-      $path = '/var/www/html/public/Media/lion.png';
-      $destinationPath = '/var/www/html/public/Media/';
-      $path = $this->optimize($path, '/var/www/html/public/Media/lion3.png');
-      die();
+      $path = '/var/www/html/public/Media/temp/' . $originalName;
+      $publicPath = '/Media/optimized/' . $productName . '.png';
+      $destinationPath = '/var/www/html/public' . $publicPath;
+      $this->optimize($path, $destinationPath);
+
       $media = new Media();
-      $media->setPath($path);
+      $media->setPath($publicPath);
+      $media->setName($productName);
       $entityManager->persist($media);
       $entityManager->flush();
+      return $destinationPath;
    }
    //width and height are optional parameters that default to 247 and 327 respectively 
    private function optimize($sourcePath, $destinationPath, $newWidth = 247, $newHeight = 327)
@@ -38,7 +35,6 @@ class MediaController extends AbstractController
       // Get the file extension
       $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
 
-      // Load the source image based on the file extension
       $sourceImage = null;
       switch ($extension) {
          case 'jpg':
@@ -57,7 +53,6 @@ class MediaController extends AbstractController
          return false;
       }
 
-      // Get the current image dimensions
       $width = imagesx($sourceImage);
       $height = imagesy($sourceImage);
 
@@ -67,17 +62,13 @@ class MediaController extends AbstractController
       // Resize the image
       imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
-      // Set the new image resolution (PPI)
       $newPPI = 72;
       $newDPI = $newPPI / 0.0254; // Convert PPI to DPI (dots per inch)
 
-      // Save the resized image
       imagepng($resizedImage, $destinationPath);
 
-      // Clean up resources
       imagedestroy($sourceImage);
       imagedestroy($resizedImage);
-
-      return $destinationPath;
+      unlink($sourcePath);
    }
 }

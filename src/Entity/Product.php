@@ -27,6 +27,9 @@ class Product
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     private Collection $categories;
 
+    #[ORM\Column(length: 255)]
+    private ?string $imagePath = null;
+
 
     public function getId(): ?int
     {
@@ -77,5 +80,17 @@ class Product
             "description" => $this->description,
         ];
         return $product;
+    }
+
+    public function getImagePath(): ?string
+    {
+        return $this->imagePath;
+    }
+
+    public function setImagePath(string $imagePath): static
+    {
+        $this->imagePath = $imagePath;
+
+        return $this;
     }
 }
