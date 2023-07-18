@@ -27,8 +27,9 @@ class Product
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     private Collection $categories;
 
-    #[ORM\Column(length: 255)]
-    private ?string $imagePath = null;
+    #[ORM\OneToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Media $media = null;
 
 
     public function getId(): ?int
@@ -82,14 +83,14 @@ class Product
         return $product;
     }
 
-    public function getImagePath(): ?string
+    public function getMedia(): ?Media
     {
-        return $this->imagePath;
+        return $this->media;
     }
 
-    public function setImagePath(string $imagePath): static
+    public function setMedia(Media $media): static
     {
-        $this->imagePath = $imagePath;
+        $this->media = $media;
 
         return $this;
     }

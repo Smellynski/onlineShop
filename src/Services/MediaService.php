@@ -1,15 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Services;
 
 use App\Entity\Media;
-use App\Entity\Product;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 
-class MediaController extends AbstractController
+class MediaService
 {
    public function optimizeImage(EntityManagerInterface $entityManager, $originalName, $productName)
    {
@@ -27,10 +23,11 @@ class MediaController extends AbstractController
       $media->setName($productName);
       $entityManager->persist($media);
       $entityManager->flush();
-      return $destinationPath;
+      return $media;
    }
+
    //width and height are optional parameters that default to 247 and 327 respectively 
-   private function optimize($sourcePath, $destinationPath, $newWidth = 247, $newHeight = 327)
+   private function optimize($sourcePath, $destinationPath, $newWidth = 400, $newHeight = 400)
    {
       // Get the file extension
       $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
@@ -61,9 +58,6 @@ class MediaController extends AbstractController
 
       // Resize the image
       imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-      $newPPI = 72;
-      $newDPI = $newPPI / 0.0254; // Convert PPI to DPI (dots per inch)
 
       imagepng($resizedImage, $destinationPath);
 

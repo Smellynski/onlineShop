@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ProductRepository;
+use Doctrine\ORM\Mapping\Id;
 
 class OnlineShopController extends AbstractController
 {
@@ -13,24 +14,25 @@ class OnlineShopController extends AbstractController
    public function startpage(ProductRepository $productRepository): Response
    {
       $products = $productRepository->findAll();
-      $image = $this->getAllImages($products);
       return $this->render(
          'OnlineShop/startPage.html.twig',
          [
             'products' => $products,
-            'image' => $image,
          ]
       );
    }
 
-   public function getAllImages($products)
+   #[Route('/productpage/{id}', name: 'productpage')]
+   public function productpage(ProductRepository $productRepository, $id): Response
    {
-      foreach ($products as $product) {
-         if ($product->getImagePath() != null) {
-            $image = file_get_contents($product->getImagePath());
-            return $image;
-         }
-      }
+      $id = intval($id);
+      $product = $productRepository->findOneBy(['id' => $id]);
+      return $this->render(
+         'OnlineShop/productPage.html.twig',
+         [
+            'product' => $product,
+         ]
+      );
    }
 
    #[Route('/getInfoForProductpage', name: 'getInfoForProductpage')]

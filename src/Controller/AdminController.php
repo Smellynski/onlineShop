@@ -15,7 +15,7 @@ use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
-use App\Controller\MediaController;
+use App\Services\MediaService;
 
 class AdminController extends AbstractController
 {
@@ -45,7 +45,7 @@ class AdminController extends AbstractController
    }
 
    #[Route('/admin/products/addProduct', name: 'addProductToDatabase', methods: ['POST'])]
-   public function addProductToDatabase(Request $request, EntityManagerInterface $entityManager, MediaController $mediaController)
+   public function addProductToDatabase(Request $request, EntityManagerInterface $entityManager, MediaService $mediaService)
    {
       $requestData = $request->get('submit');
       $productName = strval($request->get('productName'));
@@ -57,14 +57,14 @@ class AdminController extends AbstractController
             $this->getParameter('temporary_directory'),
             $image->getClientOriginalName()
          );
-         $imagePath = $mediaController->optimizeImage($entityManager, $image->getClientOriginalName(), $productName);
+         $media = $mediaService->optimizeImage($entityManager, $image->getClientOriginalName(), $productName);
       }
       if (isset($requestData)) {
          $product = new Product();
          $product->setTitle($productName);
          $product->setPrice($price);
+         $product->setMedia($media);
          $product->setDescription($description);
-         $product->setImagePath($imagePath);
          $entityManager->persist($product);
          $entityManager->flush();
       }
